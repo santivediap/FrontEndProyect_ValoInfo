@@ -19,3 +19,20 @@ document.getElementById("search-button")
         errorMessage.innerHTML = "Invalid search"
     }
 })
+
+function checkUserRegion() {
+
+    let dataTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    let region = /([a-zA-Z]+)\//gm.exec(dataTimeZone)[1]
+
+    switch(region) {
+        case "Europe":
+            return "eu"
+        case "America":
+            return "na"
+        case "Asia":
+            return "ap"
+        default:
+            return "kr"
+    }
+}
