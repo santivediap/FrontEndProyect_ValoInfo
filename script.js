@@ -36,3 +36,55 @@ function checkUserRegion() {
             return "kr"
     }
 }
+
+async function getPlayersLeaderboard(region) {
+  let result;
+  await fetch(`https://api.henrikdev.xyz/valorant/v1/leaderboard/${region}`)
+  .then(data => data.json())
+  .then(res => {
+      result = res
+  })
+  return result
+}
+
+async function paintLeaderboard() {
+  let players;
+
+  Chart.defaults.color = '#fff'
+  Chart.defaults.borderColor = '#4b6875'
+  Chart.defaults.font.size = 10;
+  const ctx = document.getElementById('topplayers');
+
+  await getPlayersLeaderboard("eu")
+  .then(res => {
+    let annonFilteredPlayers = res.filter(val => val.IsAnonymized == false)
+    annonFilteredPlayers.splice(10, annonFilteredPlayers.length-10)
+    let leaderboard = annonFilteredPlayers.map(val => [`${val.gameName}#${val.tagLine}`, val.numberOfWins])
+    players = leaderboard
+  })
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      
+      labels: players.map(player => player[0]),
+      datasets: [{
+        label: 'Wins',
+        data: players.map(player => player[1]),
+        borderColor: '#FF004C',
+        backgroundColor: 'rgba(255, 0, 76, 0.5)',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+paintLeaderboard()
