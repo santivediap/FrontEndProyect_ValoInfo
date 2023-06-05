@@ -39,12 +39,17 @@ function checkUserRegion() {
 
 async function getPlayersLeaderboard(region) {
   let result;
-  await fetch(`https://api.henrikdev.xyz/valorant/v1/leaderboard/${region}`)
-  .then(data => data.json())
-  .then(res => {
-      result = res
-  })
+
+  try {
+    await fetch(`https://api.henrikdev.xyz/valorant/v1/leaderboard/${region}`)
+      .then(data => data.json())
+      .then(res => {
+        result = res
+    })
   return result
+  } catch (error) {
+    alert(`ERROR! -> ${error}`)
+  }
 }
 
 async function paintLeaderboard() {
