@@ -12,7 +12,7 @@ if(document.getElementById("search-button") != undefined) {
           arraySearch.shift()
   
           localStorage.search = JSON.stringify(arraySearch)
-          window.location.assign("./pages/search.html");
+          window.location.assign("../pages/search.html");
   
       } else {
           let errorMessage = document.getElementById("search-error")
@@ -61,7 +61,6 @@ async function paintLeaderboard() {
     const ctx = document.getElementById('topplayers')
     Chart.defaults.color = '#fff'
     Chart.defaults.borderColor = '#4b6875'
-    Chart.defaults.font.size = 10;
   
     await getPlayersLeaderboard("eu")
     .then(res => {
@@ -96,5 +95,26 @@ async function paintLeaderboard() {
   }
 
 }
+
+function responsiveLeaderBoardText() {
+  if(window.outerWidth < 246) {
+    Chart.defaults.font.size = 2;
+  }
+  else if(window.outerWidth >= 246 && window.outerWidth < 340) {
+    Chart.defaults.font.size = 5;
+  }
+  else if (window.outerWidth > 340 && window.outerWidth < 800) {
+    Chart.defaults.font.size = 8;
+  }
+  else if (window.outerWidth > 800 && window.outerWidth < 1200) {
+    Chart.defaults.font.size = 12;
+  } else {
+    Chart.defaults.font.size = 15;
+  }
+}
+
+window.addEventListener("resize", () => {
+  responsiveLeaderBoardText()
+});
 
 paintLeaderboard()
