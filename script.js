@@ -2,7 +2,7 @@ if(document.getElementById("main-container") != undefined) {
   let basicUserDataSection = document.createElement("section")
   basicUserDataSection.className = "basicuserdata-container"
 
-  getSearchedUserData(JSON.parse(localStorage.search))
+  getSearchedBasicUserData(JSON.parse(localStorage.search))
   .then(res => {
     basicUserDataSection.innerHTML = `
     <h2>${res[1]}#${res[2]}</h2>
@@ -21,7 +21,76 @@ if(document.getElementById("main-container") != undefined) {
     </article>`
   })
 
+  let matchesUserDataSection = document.createElement("section")
+  matchesUserDataSection.className = "match-history-general-container"
+
+  getSearchedMatchesUserData(JSON.parse(localStorage.search))
+  .then(res => {
+    matchesUserDataSection.innerHTML = `
+    <article class="match-history-title-container">
+        <h2>MATCH HISTORY</h2>
+    </article>
+
+    <article class="match-history-container">
+        <div class="match">
+            <h2>${res[1]}</h2>
+            <div class="match-history-map-container">
+                <div class="map">
+                    <img src=${res[5]} alt="map">
+                </div>
+                
+                <div class="map-info">
+                    <h2>Map: ${res[0]}</h2>
+                    <p>Mode: ${res[2]}</p>
+                    <p>Rounds: ${res[3]}</p>
+                    <p>Server: ${res[4]}</p>
+                </div>
+            </div>
+
+            <div class="match-players-container">
+                <div class="player-card">
+                        <div class="player-img">
+                            <img src="https://media.valorant-api.com/agents/a3bfb853-43b2-7238-a4f1-ad90e9e46bcc/displayicon.png" alt="agent-image">
+                        </div>
+
+                        <div class="player-name">
+                            <span class="header-text"></span>
+                            <span class="content-text">TTVSantiLMAOOO#9084</span>
+                        </div>
+
+                        <div class="player-kills">
+                            <span class="header-text">K</span>
+                            <span class="content-text">15</span>
+                        </div>
+
+                        <div class="player-deaths">
+                            <span class="header-text">D</span>
+                            <span class="content-text">20</span>
+                        </div>
+
+                        <div class="player-assists">
+                            <span class="header-text">A</span>
+                            <span class="content-text">5</span>
+                        </div>
+
+                        <div class="player-points">
+                            <span class="header-text">PTS</span>
+                            <span class="content-text">1200</span>
+                        </div>
+
+                        <div class="player-total-economy">
+                            <span class="header-text">ECO</span>
+                            <span class="content-text">2000</span>
+                        </div>
+                </div>
+            </div>
+            <hr style="width: 100%;">
+        </div>
+    </article>`
+  })
+
   document.getElementById("main-container").appendChild(basicUserDataSection)
+  document.getElementById("main-container").appendChild(matchesUserDataSection)
 }
 
 if(document.getElementById("search-button") != undefined) {
@@ -48,7 +117,7 @@ if(document.getElementById("search-button") != undefined) {
   })
 }
 
-async function getSearchedUserData(user) {
+async function getSearchedBasicUserData(user) {
   try {
     let userData = [];
   
@@ -75,6 +144,41 @@ async function getSearchedUserData(user) {
     console.log(error);
   }
 }
+
+async function getSearchedMatchesUserData(user) {
+  try {
+    let userData = [];
+  
+    let basicUserDataFetch = await fetch(`https://api.henrikdev.xyz/valorant/v3/matches/${user[2]}/${user[0]}/${user[1]}`)
+    let basicUserData = basicUserDataFetch.json()
+    let mapDataFetch = await fetch("https://valorant-api.com/v1/maps")
+
+    return basicUserData.then(res => {
+      // console.log(res.data[0].metadata);
+      userData.push(res.data[0].metadata.map)
+      userData.push(res.data[0].metadata.game_start_patched)
+      userData.push(res.data[0].metadata.mode)
+      userData.push(res.data[0].rounds.length)
+      userData.push(res.data[0].metadata.cluster)
+      return mapDataFetch
+    }).then(data => data.json())
+    .then(res => {
+      const filteredMap = res.data.filter(map => map.displayName == userData[0])
+      userData.push(filteredMap[0].displayIcon)
+      // console.log(filteredMap[0].displayIcon);
+      // userData.push(res.data.elo)
+      return userData
+    })
+  
+  } catch(error) {
+    console.log(error);
+  }
+}
+
+getSearchedMatchesUserData(JSON.parse(localStorage.search))
+.then(res => {
+  console.log(res);
+})
 
 function checkUserRegion() {
 
