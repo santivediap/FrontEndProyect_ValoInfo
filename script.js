@@ -1,3 +1,29 @@
+if(document.getElementById("main-container") != undefined) {
+  let basicUserDataSection = document.createElement("section")
+  basicUserDataSection.className = "basicuserdata-container"
+
+  getSearchedUserData(JSON.parse(localStorage.search))
+  .then(res => {
+    basicUserDataSection.innerHTML = `
+    <h2>${res[1]}#${res[2]}</h2>
+    <article class="basicuserdata">
+        <div class="playerimg">
+            <img src="${res[4]}" alt="${res[1]}#${res[2]}-img">
+        </div>
+        
+        <div class="basicinfo">
+            <p>Region: ${res[0]}</p>
+            <p>Level: ${res[3]}</p>
+            <p>Rank: ${res[5]}</p>
+            <p>Elo: ${res[7]}</p>
+            <p>Last MMR: ${res[6]}</p>
+        </div>
+    </article>`
+  })
+
+  document.getElementById("main-container").appendChild(basicUserDataSection)
+}
+
 if(document.getElementById("search-button") != undefined) {
   document.getElementById("search-button")
   .addEventListener("click", (ev) => {
@@ -20,6 +46,34 @@ if(document.getElementById("search-button") != undefined) {
           errorMessage.innerHTML = "Invalid search"
       }
   })
+}
+
+async function getSearchedUserData(user) {
+  try {
+    let userData = [];
+  
+    let basicUserDataFetch = await fetch(`https://api.henrikdev.xyz/valorant/v1/account/${user[0]}/${user[1]}`)
+    let basicUserData = basicUserDataFetch.json()
+    let extraUserDataFetch = await fetch(`https://api.henrikdev.xyz/valorant/v1/mmr/${user[2]}/${user[0]}/${user[1]}`)
+
+    return basicUserData.then(res => {
+      userData.push(res.data.region)
+      userData.push(res.data.name)
+      userData.push(res.data.tag)
+      userData.push(res.data.account_level)
+      userData.push(res.data.card.large)
+      return extraUserDataFetch
+    }).then(data => data.json())
+    .then(res => {
+      userData.push(res.data.currenttierpatched)
+      userData.push(res.data.mmr_change_to_last_game)
+      userData.push(res.data.elo)
+      return userData
+    })
+  
+  } catch(error) {
+    console.log(error);
+  }
 }
 
 function checkUserRegion() {
