@@ -33,8 +33,8 @@ if(document.getElementById("search-button") != undefined) {
   
       // Search validation
   
-      if(/^([a-zA-Z0-9]+)#([A-Z0-9]+)_(eu|na|ap|kr)$/gm.test(submitButton.value)) {
-          let arraySearch = [.../^([a-zA-Z0-9]+)#([A-Z0-9]+)_(eu|na|ap|kr)$/gm.exec(submitButton.value)]
+      if(/^([\sa-zA-Z0-9]+)#([a-zA-Z0-9]+)_(eu|na|ap|kr)$/gm.test(submitButton.value)) {
+          let arraySearch = [.../^([\sa-zA-Z0-9]+)#([a-zA-Z0-9]+)_(eu|na|ap|kr)$/gm.exec(submitButton.value)]
           arraySearch.shift()
   
           localStorage.search = JSON.stringify(arraySearch)
