@@ -30,13 +30,12 @@ if(document.getElementById("main-container") != undefined) {
     <article class="match-history-title-container">
         <h2>MATCH HISTORY</h2>
     </article>
-
     <article class="match-history-container">
         <div class="match">
             <h2>${res[1]}</h2>
             <div class="match-history-map-container">
                 <div class="map">
-                    <img src=${res[5]} alt="map">
+                    <img src=${res[6]} alt="map">
                 </div>
                 
                 <div class="map-info">
@@ -48,45 +47,67 @@ if(document.getElementById("main-container") != undefined) {
             </div>
 
             <div class="match-players-container">
-                <div class="player-card">
-                        <div class="player-img">
-                            <img src="https://media.valorant-api.com/agents/a3bfb853-43b2-7238-a4f1-ad90e9e46bcc/displayicon.png" alt="agent-image">
-                        </div>
-
-                        <div class="player-name">
-                            <span class="header-text"></span>
-                            <span class="content-text">TTVSantiLMAOOO#9084</span>
-                        </div>
-
-                        <div class="player-kills">
-                            <span class="header-text">K</span>
-                            <span class="content-text">15</span>
-                        </div>
-
-                        <div class="player-deaths">
-                            <span class="header-text">D</span>
-                            <span class="content-text">20</span>
-                        </div>
-
-                        <div class="player-assists">
-                            <span class="header-text">A</span>
-                            <span class="content-text">5</span>
-                        </div>
-
-                        <div class="player-points">
-                            <span class="header-text">PTS</span>
-                            <span class="content-text">1200</span>
-                        </div>
-
-                        <div class="player-total-economy">
-                            <span class="header-text">ECO</span>
-                            <span class="content-text">2000</span>
-                        </div>
-                </div>
+              
             </div>
             <hr style="width: 100%;">
         </div>
     </article>`
+
+  const playersContainer = document.querySelector(".match-players-container")
+
+  let playersAgents = [];
+  
+  res[5].forEach(player => {
+    playersAgents.push(player.character)
+  })
+
+  getAgentsImages(playersAgents)
+  .then(agentsImages => {
+    for(let i = 0; i < res[5].length; i++) {
+      let player = document.createElement("div")
+      player.className = "player-card";
+  
+      let iteration = res[5][i];
+      
+      player.innerHTML = `
+          <div class="player-img">
+              <img src=${agentsImages[i]} alt="agent-image">
+          </div>
+  
+          <div class="player-name">
+              <span class="content-text">${iteration.name}#${iteration.tag}</span>
+          </div>
+  
+          <div class="player-kills">
+              <span class="header-text">K</span>
+              <span class="content-text">${iteration.stats.kills}</span>
+          </div>
+  
+          <div class="player-deaths">
+              <span class="header-text">D</span>
+              <span class="content-text">${iteration.stats.deaths}</span>
+          </div>
+  
+          <div class="player-assists">
+              <span class="header-text">A</span>
+              <span class="content-text">${iteration.stats.assists}</span>
+          </div>
+  
+          <div class="player-points">
+              <span class="header-text">PTS</span>
+              <span class="content-text">${iteration.stats.score}</span>
+          </div>
+  
+          <div class="player-total-economy">
+              <span class="header-text">ECO</span>
+              <span class="content-text">${iteration.economy.spent.average}</span>
+          </div>`
+  
+          playersContainer.appendChild(player)
+    }
+  })
+
+
   })
 
   document.getElementById("main-container").appendChild(basicUserDataSection)
@@ -115,6 +136,26 @@ if(document.getElementById("search-button") != undefined) {
           errorMessage.innerHTML = "Invalid search"
       }
   })
+}
+
+async function getAgentsImages(players) {
+  try {
+    let agentsImages = []
+    let agentsImagesFetch = await fetch("https://valorant-api.com/v1/agents")
+    let dataAgentsImagesFetch = agentsImagesFetch.json()
+
+    return dataAgentsImagesFetch
+    .then(player => {
+      for(let i = 0; i < players.length; i++) {
+        const filteredAgentImage = player.data.filter(val => val.displayName == players[i])
+        agentsImages.push(filteredAgentImage[0].displayIcon)
+        // console.log(filteredAgentImage[0].displayIcon);
+      }
+      return agentsImages
+    })
+  } catch(error) {
+    console.log(error);
+  }
 }
 
 async function getSearchedBasicUserData(user) {
@@ -154,19 +195,18 @@ async function getSearchedMatchesUserData(user) {
     let mapDataFetch = await fetch("https://valorant-api.com/v1/maps")
 
     return basicUserData.then(res => {
-      // console.log(res.data[0].metadata);
       userData.push(res.data[0].metadata.map)
       userData.push(res.data[0].metadata.game_start_patched)
       userData.push(res.data[0].metadata.mode)
       userData.push(res.data[0].rounds.length)
       userData.push(res.data[0].metadata.cluster)
+      userData.push(res.data[0].players.all_players)
       return mapDataFetch
     }).then(data => data.json())
     .then(res => {
       const filteredMap = res.data.filter(map => map.displayName == userData[0])
       userData.push(filteredMap[0].displayIcon)
-      // console.log(filteredMap[0].displayIcon);
-      // userData.push(res.data.elo)
+
       return userData
     })
   
