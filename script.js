@@ -30,48 +30,60 @@ if(document.getElementById("main-container") != undefined) {
     <article class="match-history-title-container">
         <h2>MATCH HISTORY</h2>
     </article>
-    <article class="match-history-container">
-        <div class="match">
-            <h2>${res[1]}</h2>
-            <div class="match-history-map-container">
-                <div class="map">
-                    <img src=${res[6]} alt="map">
-                </div>
-                
-                <div class="map-info">
-                    <h2>Map: ${res[0]}</h2>
-                    <p>Mode: ${res[2]}</p>
-                    <p>Rounds: ${res[3]}</p>
-                    <p>Server: ${res[4]}</p>
-                </div>
-            </div>
+    `
 
-            <div class="match-players-container">
-              
-            </div>
-            <hr style="width: 100%;">
-        </div>
-    </article>`
+  let matchHistoryContainer = document.createElement("article")
+  matchHistoryContainer.className = "match-history-container"
 
-  const playersContainer = document.querySelector(".match-players-container")
+  document.querySelector(".match-history-general-container")
+  .appendChild(matchHistoryContainer)
+
+  for(let i = 0; i < res.length; i++) {
+
+  const matchDiv = document.createElement("div")
+  matchDiv.className = "match"
+  matchDiv.setAttribute("id", i)
+
+  matchDiv.innerHTML = `
+  <h2>${res[i][1]}</h2>
+  <div class="match-history-map-container">
+      <div class="map">
+          <img src=${res[i][6]} alt="map">
+      </div>
+      
+      <div class="map-info">
+          <h2>Map: ${res[i][0]}</h2>
+          <p>Mode: ${res[i][2]}</p>
+          <p>Rounds: ${res[i][3]}</p>
+          <p>Server: ${res[i][4]}</p>
+      </div>
+  </div>
+
+  <div class="match-players-container">
+
+  </div>`
+
+  matchHistoryContainer.appendChild(matchDiv)
+
+  const playersContainer = document.getElementById(i)
 
   let playersAgents = [];
   
-  res[5].forEach(player => {
+  res[i][5].forEach(player => {
     playersAgents.push(player.character)
   })
 
   getAgentsImages(playersAgents)
   .then(agentsImages => {
-    for(let i = 0; i < res[5].length; i++) {
+    for(let a = 0; a < res[i][5].length; a++) {
       let player = document.createElement("div")
       player.className = "player-card";
-  
-      let iteration = res[5][i];
+
+      let iteration = res[i][5][a];
       
       player.innerHTML = `
           <div class="player-img">
-              <img src=${agentsImages[i]} alt="agent-image">
+              <img src=${agentsImages[a]} alt="agent-image">
           </div>
   
           <div class="player-name">
@@ -108,7 +120,7 @@ if(document.getElementById("main-container") != undefined) {
   })
 
 
-  })
+  }})
 
   document.getElementById("main-container").appendChild(basicUserDataSection)
   document.getElementById("main-container").appendChild(matchesUserDataSection)
@@ -149,7 +161,6 @@ async function getAgentsImages(players) {
       for(let i = 0; i < players.length; i++) {
         const filteredAgentImage = player.data.filter(val => val.displayName == players[i])
         agentsImages.push(filteredAgentImage[0].displayIcon)
-        // console.log(filteredAgentImage[0].displayIcon);
       }
       return agentsImages
     })
@@ -188,37 +199,39 @@ async function getSearchedBasicUserData(user) {
 
 async function getSearchedMatchesUserData(user) {
   try {
-    let userData = [];
+    let matchesData = [];
   
-    let basicUserDataFetch = await fetch(`https://api.henrikdev.xyz/valorant/v3/matches/${user[2]}/${user[0]}/${user[1]}`)
-    let basicUserData = basicUserDataFetch.json()
+    let basicMatchesDataFetch = await fetch(`https://api.henrikdev.xyz/valorant/v3/matches/${user[2]}/${user[0]}/${user[1]}`)
+    let basicMatchesData = basicMatchesDataFetch.json()
     let mapDataFetch = await fetch("https://valorant-api.com/v1/maps")
 
-    return basicUserData.then(res => {
-      userData.push(res.data[0].metadata.map)
-      userData.push(res.data[0].metadata.game_start_patched)
-      userData.push(res.data[0].metadata.mode)
-      userData.push(res.data[0].rounds.length)
-      userData.push(res.data[0].metadata.cluster)
-      userData.push(res.data[0].players.all_players)
+    return basicMatchesData.then(res => {
+
+      for(let i = 0; i < res.data.length; i++) {
+        let matchData = []
+        matchesData.push(matchData)
+
+        matchesData[i].push(res.data[i].metadata.map)
+        matchesData[i].push(res.data[i].metadata.game_start_patched)
+        matchesData[i].push(res.data[i].metadata.mode)
+        matchesData[i].push(res.data[i].rounds.length)
+        matchesData[i].push(res.data[i].metadata.cluster)
+        matchesData[i].push(res.data[i].players.all_players)
+      }
       return mapDataFetch
     }).then(data => data.json())
     .then(res => {
-      const filteredMap = res.data.filter(map => map.displayName == userData[0])
-      userData.push(filteredMap[0].displayIcon)
-
-      return userData
+      for(let i = 0; i < matchesData.length; i++) {
+        const filteredMap = res.data.filter(map => map.displayName == matchesData[i][0])
+        matchesData[i].push(filteredMap[0].displayIcon)
+      }
+      return matchesData
     })
   
   } catch(error) {
     console.log(error);
   }
 }
-
-getSearchedMatchesUserData(JSON.parse(localStorage.search))
-.then(res => {
-  console.log(res);
-})
 
 function checkUserRegion() {
 
