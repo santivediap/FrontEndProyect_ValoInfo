@@ -1,150 +1,153 @@
-getSearchedBasicUserData(JSON.parse(localStorage.search))
-.then(res => {
-  if(res == "error") {
-    if(document.getElementById("main-container") != undefined) {
-      let errorSearchSection = document.createElement("section")
-      errorSearchSection.className = "error-search-container"
-
-      errorSearchSection.innerHTML = `
-      <h2>PLAYER NOT FOUND</h2>
-      <img src="https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061131_1280.png" alt="error-img">`
-
-      document.getElementById("main-container")
-      .appendChild(errorSearchSection)
-    }
-  } else {
-    if(document.getElementById("main-container") != undefined) {
-      let basicUserDataSection = document.createElement("section")
-      basicUserDataSection.className = "basicuserdata-container"
-    
-      getSearchedBasicUserData(JSON.parse(localStorage.search))
-      .then(res => {
-        basicUserDataSection.innerHTML = `
-        <h2>${res[1]}#${res[2]}</h2>
-        <article class="basicuserdata">
-            <div class="playerimg">
-                <img src="${res[4]}" alt="${res[1]}#${res[2]}-img">
+if(localStorage.search) {
+  getSearchedBasicUserData(JSON.parse(localStorage.search))
+  .then(res => {
+    if(res == "error") {
+      if(document.getElementById("main-container") != undefined) {
+        let errorSearchSection = document.createElement("section")
+        errorSearchSection.className = "error-search-container"
+  
+        errorSearchSection.innerHTML = `
+        <h2>PLAYER NOT FOUND</h2>
+        <img src="https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061131_1280.png" alt="error-img">`
+  
+        document.getElementById("main-container")
+        .appendChild(errorSearchSection)
+      }
+    } else {
+      if(document.getElementById("main-container") != undefined) {
+        let basicUserDataSection = document.createElement("section")
+        basicUserDataSection.className = "basicuserdata-container"
+      
+        getSearchedBasicUserData(JSON.parse(localStorage.search))
+        .then(res => {
+          basicUserDataSection.innerHTML = `
+          <h2>${res[1]}#${res[2]}</h2>
+          <article class="basicuserdata">
+              <div class="playerimg">
+                  <img src="${res[4]}" alt="${res[1]}#${res[2]}-img">
+              </div>
+              
+              <div class="basicinfo">
+                  <p>Region: ${res[0]}</p>
+                  <p>Level: ${res[3]}</p>
+                  <p>Rank: ${res[5]}</p>
+                  <p>Elo: ${res[7]}</p>
+                  <p>Last MMR: ${res[6]}</p>
+              </div>
+          </article>`
+        })
+      
+        let matchesUserDataSection = document.createElement("section")
+        matchesUserDataSection.className = "match-history-general-container"
+      
+        getSearchedMatchesUserData(JSON.parse(localStorage.search))
+        .then(res => {
+          matchesUserDataSection.innerHTML = `
+          <article class="match-history-title-container">
+              <h2>MATCH HISTORY</h2>
+          </article>
+          `
+      
+        let matchHistoryContainer = document.createElement("article")
+        matchHistoryContainer.className = "match-history-container"
+      
+        document.querySelector(".match-history-general-container")
+        .appendChild(matchHistoryContainer)
+      
+        for(let i = 0; i < res.length; i++) {
+      
+        const matchDiv = document.createElement("div")
+        matchDiv.className = "match"
+        matchDiv.setAttribute("id", i)
+      
+        matchDiv.innerHTML = `
+        <h2>${res[i][1]}</h2>
+        <div class="match-history-map-container">
+            <div class="map">
+                <img src=${res[i][6]} alt="map">
             </div>
             
-            <div class="basicinfo">
-                <p>Region: ${res[0]}</p>
-                <p>Level: ${res[3]}</p>
-                <p>Rank: ${res[5]}</p>
-                <p>Elo: ${res[7]}</p>
-                <p>Last MMR: ${res[6]}</p>
+            <div class="map-info">
+                <h2>Map: ${res[i][0]}</h2>
+                <p>Mode: ${res[i][2]}</p>
+                <p>Rounds: ${res[i][3]}</p>
+                <p>Server: ${res[i][4]}</p>
             </div>
-        </article>`
-      })
-    
-      let matchesUserDataSection = document.createElement("section")
-      matchesUserDataSection.className = "match-history-general-container"
-    
-      getSearchedMatchesUserData(JSON.parse(localStorage.search))
-      .then(res => {
-        matchesUserDataSection.innerHTML = `
-        <article class="match-history-title-container">
-            <h2>MATCH HISTORY</h2>
-        </article>
-        `
-    
-      let matchHistoryContainer = document.createElement("article")
-      matchHistoryContainer.className = "match-history-container"
-    
-      document.querySelector(".match-history-general-container")
-      .appendChild(matchHistoryContainer)
-    
-      for(let i = 0; i < res.length; i++) {
-    
-      const matchDiv = document.createElement("div")
-      matchDiv.className = "match"
-      matchDiv.setAttribute("id", i)
-    
-      matchDiv.innerHTML = `
-      <h2>${res[i][1]}</h2>
-      <div class="match-history-map-container">
-          <div class="map">
-              <img src=${res[i][6]} alt="map">
-          </div>
-          
-          <div class="map-info">
-              <h2>Map: ${res[i][0]}</h2>
-              <p>Mode: ${res[i][2]}</p>
-              <p>Rounds: ${res[i][3]}</p>
-              <p>Server: ${res[i][4]}</p>
-          </div>
-      </div>`
-    
-      let matchPlayersContainer = document.createElement("div")
-      matchPlayersContainer.className = "match-players-container"
-      matchPlayersContainer.setAttribute("id", i)
-    
-      matchDiv.appendChild(matchPlayersContainer)
-    
-      matchHistoryContainer.appendChild(matchDiv)
-    
-      // const playersContainer = document.getElementById(i)
-    
-      let playersAgents = [];
+        </div>`
       
-      res[i][5].forEach(player => {
-        playersAgents.push(player.character)
-      })
-    
-      getAgentsImages(playersAgents)
-      .then(agentsImages => {
-        for(let a = 0; a < res[i][5].length; a++) {
-          let player = document.createElement("div")
-          player.className = "player-card";
-    
-          let iteration = res[i][5][a];
-          
-          player.innerHTML = `
-              <div class="player-img">
-                  <img src=${agentsImages[a]} alt="agent-image">
-              </div>
+        let matchPlayersContainer = document.createElement("div")
+        matchPlayersContainer.className = "match-players-container"
+        matchPlayersContainer.setAttribute("id", i)
       
-              <div class="player-name">
-                  <span class="content-text">${iteration.name}#${iteration.tag}</span>
-              </div>
+        matchDiv.appendChild(matchPlayersContainer)
       
-              <div class="player-kills">
-                  <span class="header-text">K</span>
-                  <span class="content-text">${iteration.stats.kills}</span>
-              </div>
+        matchHistoryContainer.appendChild(matchDiv)
       
-              <div class="player-deaths">
-                  <span class="header-text">D</span>
-                  <span class="content-text">${iteration.stats.deaths}</span>
-              </div>
+        // const playersContainer = document.getElementById(i)
       
-              <div class="player-assists">
-                  <span class="header-text">A</span>
-                  <span class="content-text">${iteration.stats.assists}</span>
-              </div>
+        let playersAgents = [];
+        
+        res[i][5].forEach(player => {
+          playersAgents.push(player.character)
+        })
       
-              <div class="player-points">
-                  <span class="header-text">PTS</span>
-                  <span class="content-text">${iteration.stats.score}</span>
-              </div>
+        getAgentsImages(playersAgents)
+        .then(agentsImages => {
+          for(let a = 0; a < res[i][5].length; a++) {
+            let player = document.createElement("div")
+            player.className = "player-card";
       
-              <div class="player-total-economy">
-                  <span class="header-text">ECO</span>
-                  <span class="content-text">${iteration.economy.spent.average}</span>
-              </div>`
+            let iteration = res[i][5][a];
+            
+            player.innerHTML = `
+                <div class="player-img">
+                    <img src=${agentsImages[a]} alt="agent-image">
+                </div>
+        
+                <div class="player-name">
+                    <span class="content-text">${iteration.name}#${iteration.tag}</span>
+                </div>
+        
+                <div class="player-kills">
+                    <span class="header-text">K</span>
+                    <span class="content-text">${iteration.stats.kills}</span>
+                </div>
+        
+                <div class="player-deaths">
+                    <span class="header-text">D</span>
+                    <span class="content-text">${iteration.stats.deaths}</span>
+                </div>
+        
+                <div class="player-assists">
+                    <span class="header-text">A</span>
+                    <span class="content-text">${iteration.stats.assists}</span>
+                </div>
+        
+                <div class="player-points">
+                    <span class="header-text">PTS</span>
+                    <span class="content-text">${iteration.stats.score}</span>
+                </div>
+        
+                <div class="player-total-economy">
+                    <span class="header-text">ECO</span>
+                    <span class="content-text">${iteration.economy.spent.average}</span>
+                </div>`
+        
+                matchPlayersContainer.appendChild(player)
+          }
+        })
       
-              matchPlayersContainer.appendChild(player)
-        }
-      })
-    
-    
-      }})
-    
-      document.getElementById("main-container").appendChild(basicUserDataSection)
-      document.getElementById("main-container").appendChild(matchesUserDataSection)
+      
+        }})
+      
+        document.getElementById("main-container").appendChild(basicUserDataSection)
+        document.getElementById("main-container").appendChild(matchesUserDataSection)
+      }
     }
-  }
-})
-.catch(err => console.log(err))
+  })
+  .catch(err => console.log(err))
+}
+
 
 
 if(document.getElementById("search-button") != undefined) {
@@ -286,7 +289,7 @@ async function getPlayersLeaderboard(region) {
     })
   return result
   } catch (error) {
-    alert(`ERROR! -> ${error}`)
+    console.log(`ERROR! -> ${error}`)
   }
 }
 
