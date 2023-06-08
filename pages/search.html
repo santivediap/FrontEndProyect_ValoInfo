@@ -5,9 +5,45 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../styles.css">
-    <title>ValorantStats</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" type="image/x-icon" href="../assets/valorant-logo.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>ValorantInfo</title>
 </head>
 <body>
+    <header>
+        <nav class="header-container">
+            <a href="../home.html" id="valorantlogo-img">
+                <img src="https://www.svgrepo.com/show/424912/valorant-logo-play-2.svg" alt="valorant-logo">
+            </a>
+        </nav>
+    </header>
+    <main class="main-container" id="main-container">
+        <section class="header-text-container">
+            <h2>SEARCH RESULTS</h2>
+        </section>
+        
+        <section class="search-container">
+            <h2>Search</h2>
+            <input type="text" name="player-search" placeholder="E.g: PlayerName#9084_eu" id="player-search">
+            <span id="search-error"></span>
+            <button class="submit-button" id="search-button">SUBMIT</button>
+        </section>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+    </main>
+
+    <footer class="footer-container">
+        <div class="socials-container">
+            <img src="https://cdn-icons-png.flaticon.com/512/37/37409.png" alt="facebook-logo" id="facebooklogo-img">
+            <img src="https://cdn-icons-png.flaticon.com/512/60/60580.png" alt="twitter-logo" id="twitterlogo-img">
+            <img src="https://cdn-icons-png.flaticon.com/512/87/87390.png" alt="instagram-logo" id="instagramlogo-img">
+        </div>
+    </footer>
     <script src="../script.js"></script>
 </body>
 </html>
