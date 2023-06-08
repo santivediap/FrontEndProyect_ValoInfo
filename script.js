@@ -57,15 +57,17 @@ if(document.getElementById("main-container") != undefined) {
           <p>Rounds: ${res[i][3]}</p>
           <p>Server: ${res[i][4]}</p>
       </div>
-  </div>
-
-  <div class="match-players-container">
-
   </div>`
+
+  let matchPlayersContainer = document.createElement("div")
+  matchPlayersContainer.className = "match-players-container"
+  matchPlayersContainer.setAttribute("id", i)
+
+  matchDiv.appendChild(matchPlayersContainer)
 
   matchHistoryContainer.appendChild(matchDiv)
 
-  const playersContainer = document.getElementById(i)
+  // const playersContainer = document.getElementById(i)
 
   let playersAgents = [];
   
@@ -115,7 +117,7 @@ if(document.getElementById("main-container") != undefined) {
               <span class="content-text">${iteration.economy.spent.average}</span>
           </div>`
   
-          playersContainer.appendChild(player)
+          matchPlayersContainer.appendChild(player)
     }
   })
 
@@ -170,12 +172,11 @@ async function getAgentsImages(players) {
 }
 
 async function getSearchedBasicUserData(user) {
-  try {
     let userData = [];
   
     let basicUserDataFetch = await fetch(`https://api.henrikdev.xyz/valorant/v1/account/${user[0]}/${user[1]}`)
     let basicUserData = basicUserDataFetch.json()
-    let extraUserDataFetch = await fetch(`https://api.henrikdev.xyz/valorant/v1/mmr/${user[2]}/${user[0]}/${user[1]}`)
+    // let extraUserDataFetch = await 
 
     return basicUserData.then(res => {
       userData.push(res.data.region)
@@ -183,18 +184,15 @@ async function getSearchedBasicUserData(user) {
       userData.push(res.data.tag)
       userData.push(res.data.account_level)
       userData.push(res.data.card.large)
-      return extraUserDataFetch
-    }).then(data => data.json())
+      return fetch(`https://api.henrikdev.xyz/valorant/v1/mmr/${user[2]}/${user[0]}/${user[1]}`)
+    }).catch(err => console.log(err))
+    .then(data => data.json())
     .then(res => {
       userData.push(res.data.currenttierpatched)
       userData.push(res.data.mmr_change_to_last_game)
       userData.push(res.data.elo)
       return userData
     })
-  
-  } catch(error) {
-    console.log(error);
-  }
 }
 
 async function getSearchedMatchesUserData(user) {
